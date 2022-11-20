@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: source sans pro, sans-serif;
+    background-color: #fffefe;
+}
+
+.container {
+    width: 1000px;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 16px;
+}
+
+.green {
+    color: #5db85c;
+}
+
+.bg_green {
+    background-color: #5db85c;
+}
+
+.dot {
+    background-color: #b95d5c;
+    width: 0.4rem;
+    height: 0.4rem;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 0.5rem;
+}
