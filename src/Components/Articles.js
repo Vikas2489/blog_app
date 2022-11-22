@@ -1,21 +1,31 @@
-import { AiFillHeart } from 'react-icons/ai';
-import { NavLink } from 'react-router-dom';
+import Article from './Article';
 import Tags from './Tags';
 import React from 'react';
+import Loader from './Loader';
+import { rootURL, articlesURL, tagsURL } from '../utils/constants';
+import Pagination from './Pagination';
+import { Link } from 'react-router-dom';
 
 class Articles extends React.Component {
   constructor(props) {
-    super();
+    super(props);
     this.state = {
       articlesArr: [],
       totalArticles: '',
       selectedPageButton: 1,
       selectedTag: null,
-      globalFeedVisible: true,
     };
   }
+  componentDidUpdate(_prevprops, prevState) {
+    if (
+      prevState.selectedPageButton != this.state.selectedPageButton ||
+      prevState.selectedTag != this.state.selectedTag
+    ) {
+      this.fetchArticles();
+    }
+  }
   componentDidMount() {
-    return this.fetchGlobalArticles();
+    return this.fetchArticles();
   }
   pagination = () => {
     let { totalArticles } = this.state;
@@ -30,98 +40,51 @@ class Articles extends React.Component {
     }
     return arrOfPagination;
   };
-  handleClickOnPageButton = (n) => {
-    if (n == 1) {
-      return fetch(
-        `https://mighty-oasis-08080.herokuapp.com/api/articles?limit=${10}`
-      )
-        .then((res) => res.json())
-        .then((data) => {
-          let articles = data.articles;
-          this.setState({
-            articlesArr: articles,
-            selectedPageButton: n,
-          });
-        });
-    } else {
-      n = n - 1;
-      return fetch(
-        `https://mighty-oasis-08080.herokuapp.com/api/articles?offset=${Number(
-          n + '0'
-        )}`
-      )
-        .then((res) => res.json())
-        .then((data) => {
-          let filteredData = data.articles.filter((a, i) => {
-            if (i <= 9) {
-              return a;
-            }
-            return;
-          });
-          this.setState({
-            articlesArr: filteredData,
-            selectedPageButton: n + 1,
-          });
-        });
-    }
+  handleClickOnPageButton = (pageNo) => {
+    this.setState(() => {
+      return { selectedPageButton: pageNo };
+    });
   };
-  fetchGlobalArticles = () => {
-    return fetch(
-      'https://mighty-oasis-08080.herokuapp.com/api/articles?limit=10'
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        let articles = data.articles;
-        this.setState({
-          articlesArr: articles,
-          totalArticles: data.articlesCount,
-          selectedTag: null,
-          globalFeedVisible: true,
-        });
-      });
-  };
-  fetchArticlesAccToTag = () => {
+
+  fetchArticles = () => {
     let { selectedTag } = this.state;
-    if (selectedTag !== null) {
-      return fetch(
-        `https://mighty-oasis-08080.herokuapp.com/api/articles?tag=${selectedTag}`
-      )
-        .then((res) => res.json())
-        .then((data) => {
-          this.setState({
-            articlesArr: data.articles,
-            totalArticles: data.articlesCount,
-            globalFeedVisible: false,
-          });
+    const offset = (this.state.selectedPageButton - 1) * 10;
+    return fetch(
+      articlesURL +
+        `?limit=10&offset=${offset}` +
+        (selectedTag != null ? `&tag=${selectedTag}` : '')
+    )
+      .then((res) => {
+        if (res.ok) {
+          return res.json();
+        } else {
+          throw new Error('something went wrong');
+        }
+      })
+      .then((data) => {
+        this.setState({
+          articlesArr: data.articles,
+          totalArticles: data.articlesCount,
         });
-    }
-    return;
+      })
+      .catch((err) => console.log(err));
   };
 
   handleTags = (tag) => {
-    return this.setState(
-      () => {
-        return { selectedTag: tag };
-      },
-      () => this.fetchArticlesAccToTag()
-    );
+    return this.setState({ selectedTag: tag, selectedPageButton: 1 });
   };
-
   render() {
-    let {
-      articlesArr,
-      totalArticles,
-      selectedPageButton,
-      selectedTag,
-      globalFeedVisible,
-    } = this.state;
+    let { articlesArr, totalArticles, selectedPageButton, selectedTag } =
+      this.state;
     let arrOfButton = this.pagination();
     return (
       <div className="container flex justify-between">
         <article className="basis-[72%]">
           <div>
             <p
-              onClick={this.fetchGlobalArticles}
+              onClick={() =>
+                this.setState({ selectedTag: null, selectedPageButton: 1 })
+              }
               className={
                 selectedTag != null
                   ? 'p-1 cursor-pointer text-gray-400 px-3 border-b-[1.4px] border-b-solid  inline-block -mb-[1px]'
@@ -142,95 +105,19 @@ class Articles extends React.Component {
           <section>
             {articlesArr.length > 0 ? (
               articlesArr.map((article, i) => {
-                return (
-                  <article
-                    key={article.slug}
-                    className="my-3 border-b-[1.4px] border-[#E5E5E5] pb-5"
-                  >
-                    <div className="flex my-5 justify-between">
-                      <div className="flex items-center">
-                        <img
-                          className="w-10 h-10 rounded-full "
-                          src={article.author.image}
-                          alt={i}
-                        />
-                        <div className="ml-4">
-                          <h4 className="text-green-500 text-sm">
-                            {article.author.username}
-                          </h4>
-                          <p className="text-[#CECECF] text-xs font-thin">
-                            {new Date(`${article.createdAt}`).toDateString()}
-                          </p>
-                        </div>
-                      </div>
-                      <button
-                        type="button"
-                        className="green border-[1.5px] h-6 w-9 text-sm p-1 hover:bg-green-500 hover:text-white rounded flex border-green-500 items-center"
-                      >
-                        <AiFillHeart />
-                        <span className="ml-1">0</span>
-                      </button>
-                    </div>
-                    <NavLink to={'/articles/' + article.slug}>
-                      <h2 className="text-[#363A3D] font-semibold text-[19px] ">
-                        {article.title}
-                      </h2>
-                    </NavLink>
-                    {/* <p className="text-[#B0B1B0] text-sm font-thin">
-                      {article.description}
-                    </p> */}
-                    <div className="flex justify-between items-center">
-                      <button className="text-[#B0B1B0] mt-6 text-xs">
-                        Read more...
-                      </button>
-                      <div>
-                        {article.tagList.length > 0
-                          ? article.tagList.map((tag, i) => {
-                              if (tag) {
-                                return (
-                                  <button
-                                    key={i}
-                                    className="text-[#B0B1B0] mx-1 border-[1px] rounded-full inline-block px-2 p-[2px]  border-solid mt-6 text-xs"
-                                  >
-                                    {tag}
-                                  </button>
-                                );
-                              }
-                            })
-                          : ''}
-                      </div>
-                    </div>
-                  </article>
-                );
+                return <Article key={article.slug} article={article} i={i} />;
               })
             ) : (
-              <p>Loading.....</p>
+              <Loader />
             )}
           </section>
-          <div className="flex flex-wrap">
-            {globalFeedVisible
-              ? arrOfButton.length > 1
-                ? arrOfButton.map((n) => {
-                    return (
-                      <button
-                        key={n + 2}
-                        onClick={() => this.handleClickOnPageButton(n)}
-                        className={
-                          selectedPageButton == n
-                            ? 'bg-green-400  text-sm m-1 text-white border-[1px] border-solid inline-block px-2 py-1'
-                            : 'green text-sm m-1  hover:bg-gray-100 hover:underline border-[1px] border-solid inline-block px-2 py-1'
-                        }
-                        type="button"
-                      >
-                        {n}
-                      </button>
-                    );
-                  })
-                : ''
-              : ''}
-          </div>
+          <Pagination
+            arrOfButton={arrOfButton}
+            handleClickOnPageButton={this.handleClickOnPageButton}
+            selectedPageButton={selectedPageButton}
+          />
         </article>
-        <Tags handleTags={this.handleTags} />
+        <Tags handleTags={this.handleTags} selectedTag={selectedTag} />
       </div>
     );
   }

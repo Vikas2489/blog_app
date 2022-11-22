@@ -1,52 +1,65 @@
 import React from 'react';
+import { tagsURL } from '../utils/constants';
+import Loader from './Loader';
+
 export default class Tags extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       tags: [],
+      err: '',
     };
   }
   componentDidMount() {
-    return fetch('https://mighty-oasis-08080.herokuapp.com/api/tags')
+    return fetch(tagsURL)
       .then((res) => {
-        return res.json();
+        if (res.ok) {
+          return res.json();
+        } else {
+          throw new Error(res.statusText);
+        }
       })
       .then((data) => {
         this.setState({
           tags: data.tags,
         });
-      });
+      })
+      .catch((error) => this.setState({ err: 'Not able to fetch!' }));
   }
-  handleTags = (tag) => {
-    return this.setState(
-      () => {
-        return { selectedTag: tag };
-      },
-      () => this.fetchArticlesAccToTag()
-    );
-  };
+
   render() {
+    let { selectedTag, handleTags } = this.props;
+
     return (
       <div className="basis-[23%] h-fit p-2 rounded bg-[#F2F2F3]">
         <h4 className="text-[#606364] text-sm my-[2px]">Popular tags</h4>
-        <ul className="flex flex-wrap">
-          {this.state.tags.length > 0 ? (
+        {!this.state.err ? (
+          this.state.tags.length > 0 ? (
             this.state.tags.map((tag) => {
               return (
-                <li key={tag}>
-                  <button
-                    onClick={() => this.props.handleTags(tag)}
-                    className="hover:bg-[#687077]  inline-block mr-2 bg-[#808B91] text-xs text-white rounded-full my-[2px] py-[2px] px-1"
-                  >
-                    {tag}
-                  </button>
-                </li>
+                <button
+                  key={tag}
+                  onClick={() => handleTags(tag)}
+                  className={
+                    selectedTag != tag
+                      ? 'hover:bg-[#687077] inline-block mr-2 bg-[#808B91] text-xs text-white rounded-full m-[3.3px] px-[9px] py-[4px]'
+                      : 'inline-block underline mr-2 bg-[#687077] text-xs text-white rounded-full m-[3.3px] py-[4px] px-[9px]'
+                  }
+                >
+                  {tag}
+                </button>
               );
             })
           ) : (
-            <p>Loading...</p>
-          )}
-        </ul>
+            <div className="flex justify-center items-center">
+              <Loader />
+            </div>
+          )
+        ) : (
+          <p className="text-red-600 text-center text-xs my-4">
+            {this.state.err}
+          </p>
+        )}
       </div>
     );
   }

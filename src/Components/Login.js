@@ -1,5 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
+import validate from '../utils/validate';
 
 export default class Login extends React.Component {
   constructor(props) {
@@ -14,47 +15,21 @@ export default class Login extends React.Component {
     };
   }
 
-  checkLetterOrNumber = (str) => {
-    let splittedArray = str.split('');
-    let mapped = splittedArray.map((s) => {
-      if (s == '0' || Boolean(Number(s)) == true) {
-        return 'number';
-      } else {
-        return 'string';
-      }
-    });
-    return mapped;
-  };
-
-  handlePasswordError = (value) => {
-    if (!value) {
-      return 'password cannot be blank';
-    } else if (value.length < 6) {
-      return 'password must be more than 6 characters';
-    } else if (!/^(?=.*[a-zA-Z])(?=.*[0-9])/.test(value)) {
-      return 'password must contain one letter and one number';
-    } else {
-      return '';
-    }
-  };
-
   handleChange = ({ target }) => {
     let { name, value } = target;
-    let errors = this.state.errors;
-    switch (name) {
-      case 'email':
-        errors[name] = !value ? 'email cannot be blank' : '';
-        break;
-      case 'password':
-        errors[name] = this.handlePasswordError(value);
-        break;
-      default:
-        break;
-    }
+    let errors = { ...this.state.errors };
+    validate(errors, name, value);
     return this.setState({
       [name]: value,
+      errors,
     });
   };
+
+  handleSubmit = (e) => {
+    e.preventDefault();
+    let { email, username, password } = this.state.errors;
+  };
+
   render() {
     let { email, password } = this.state.errors;
     return (
@@ -74,7 +49,11 @@ export default class Login extends React.Component {
             {password || email}
           </span>
         </div>
-        <form action="#">
+        <form
+          action="/api/users/login"
+          method="post"
+          onSubmit={this.handleSubmit}
+        >
           <input
             type="email"
             name="email"
@@ -92,12 +71,12 @@ export default class Login extends React.Component {
             className="border-[1px] w-full rounded block bg-transparent border-[#D9D8D8] border-solid py-2 px-3 placeholder:font-normal placeholder:text-[#999898]"
           />
           <div className="text-right">
-            <button
+            <input
               type="submit"
-              className="bg_green rounded text-white py-3 px-6 my-4"
-            >
-              Sign in
-            </button>
+              className="bg_green btn-login rounded text-white py-3 px-6 my-4"
+              disabled={this.state.errors.email || this.state.errors.password}
+              value="Sign In"
+            />
           </div>
         </form>
       </section>

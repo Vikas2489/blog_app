@@ -7,7 +7,7 @@ import { Switch } from 'react-router';
 import { Route } from 'react-router';
 import Articles from './Articles';
 import '../styles/styles.css';
-import SingleArticle from './SingleArticle';
+import SingleArticleInfo from './SingleArticleInfo';
 import Tags from './Tags';
 
 export default class App extends React.Component {
@@ -23,7 +23,7 @@ export default class App extends React.Component {
             <Hero />
             <Articles />
           </Route>
-          <Route path="/articles/:slug" component={SingleArticle} />
+          <Route path="/articles/:slug" component={SingleArticleInfo} />
           <Route path="/login">
             <Login />
           </Route>

@@ -1,5 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
+import validate from '../utils/validate';
 
 export default class Register extends React.Component {
   constructor(props) {
@@ -15,33 +16,20 @@ export default class Register extends React.Component {
       },
     };
   }
+
   handleChange = ({ target }) => {
     let { name, value } = target;
-    let errors = this.state.errors;
-    switch (name) {
-      case 'username':
-        errors[name] =
-          value.length < 6 ? 'username cannot be less than 6 characters' : '';
-        break;
-      case 'username':
-        errors[name] = !value ? 'username cannot be blank' : '';
-        break;
-      case 'password':
-        errors[name] =
-          value.length < 6 ? 'password cannot be less than 6 characters' : '';
-        break;
-      case 'password':
-        errors[name] = !value ? 'password cannot be blank' : '';
-        break;
-      case 'email':
-        errors[name] = !value ? 'email cannot be blank' : '';
-      default:
-        break;
-    }
-
+    let errors = { ...this.state.errors };
+    validate(errors, name, value);
     this.setState({
       [name]: value,
+      errors,
     });
+  };
+
+  handleSubmit = (e) => {
+    e.preventDefault();
+    let { email, username, password } = this.state.errors;
   };
 
   render() {
@@ -57,44 +45,56 @@ export default class Register extends React.Component {
             Have an account?
           </NavLink>
         </div>
-        <form action="#">
-          <div className="flex items-center">
-            {username || password || email ? <div className="dot"></div> : ''}
-            <span className="text-[#b95d5c] text-xs font-semibold">
-              {username || password || email}
-            </span>
-          </div>
+        <form action="/api/users" method="post" onSubmit={this.handleSubmit}>
           <input
             type="text"
             name="username"
             placeholder="Username"
             value={this.state.username}
             onChange={this.handleChange}
-            className="border-[1px] my-4 w-full rounded block bg-transparent  border-[#D9D8D8] border-solid py-2 px-3 placeholder:font-normal placeholder:text-[#999898]"
+            className="border-[1px] my-2 w-full rounded block bg-transparent border-[#D9D8D8] border-solid py-2 px-3 placeholder:font-normal placeholder:text-[#999898]"
           />
+          <div className="flex items-center">
+            {username ? <div className="dot"></div> : ''}
+            <span className="text-[#b95d5c] text-xs font-semibold">
+              {username}
+            </span>
+          </div>
           <input
             type="email"
             name="email"
             placeholder="Email"
             onChange={this.handleChange}
             value={this.state.email}
-            className="border-[1px] my-4 w-full rounded block bg-transparent border-[#D9D8D8] border-solid py-2 px-3 placeholder:font-normal placeholder:text-[#999898]"
+            className="border-[1px] my-2 w-full rounded block bg-transparent border-[#D9D8D8] border-solid py-2 px-3 placeholder:font-normal placeholder:text-[#999898]"
           />
+          <div className="flex items-center">
+            {email ? <div className="dot"></div> : ''}
+            <span className="text-[#b95d5c] text-xs font-semibold">
+              {email}
+            </span>
+          </div>
           <input
             type="password"
             name="password"
             placeholder="Password"
             value={this.state.password}
             onChange={this.handleChange}
-            className="border-[1px] w-full rounded block bg-transparent border-[#D9D8D8] border-solid py-2 px-3 placeholder:font-normal placeholder:text-[#999898]"
+            className="border-[1px] w-full rounded block bg-transparent border-[#D9D8D8] border-solid py-2 px-3 placeholder:font-normal placeholder:text-[#999898] my-1"
           />
+          <div className="flex items-center">
+            {password ? <div className="dot"></div> : ''}
+            <span className="text-[#b95d5c] text-xs font-semibold">
+              {password}
+            </span>
+          </div>
           <div className="text-right">
-            <button
+            <input
               type="submit"
-              className="bg_green rounded text-white py-3 px-6 my-4"
-            >
-              Sign up
-            </button>
+              value="Sign up"
+              disabled={username || email || password}
+              className="bg_green btn-register rounded text-white py-3 px-6 my-3"
+            />
           </div>
         </form>
       </section>

@@ -33,3 +33,9 @@ body {
     display: inline-block;
     margin-right: 0.5rem;
 }
+
+.btn-login:disabled,
+.btn-register:disabled {
+    cursor: not-allowed;
+    background-color: rosybrown;
+}
