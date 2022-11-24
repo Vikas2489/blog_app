@@ -28,8 +28,7 @@ export default class Tags extends React.Component {
   }
 
   render() {
-    let { selectedTag, handleTags } = this.props;
-
+    let { selectedTab, handleTags } = this.props;
     return (
       <div className="basis-[23%] h-fit p-2 rounded bg-[#F2F2F3]">
         <h4 className="text-[#606364] text-sm my-[2px]">Popular tags</h4>
@@ -41,7 +40,7 @@ export default class Tags extends React.Component {
                   key={tag}
                   onClick={() => handleTags(tag)}
                   className={
-                    selectedTag != tag
+                    selectedTab != tag
                       ? 'hover:bg-[#687077] inline-block mr-2 bg-[#808B91] text-xs text-white rounded-full m-[3.3px] px-[9px] py-[4px]'
                       : 'inline-block underline mr-2 bg-[#687077] text-xs text-white rounded-full m-[3.3px] py-[4px] px-[9px]'
                   }
