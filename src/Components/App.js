@@ -6,55 +6,135 @@ import Register from './Register';
 import { Switch } from 'react-router';
 import { Route, Redirect } from 'react-router';
 import Articles from './Articles';
+import NewArticleForm from './NewArticleForm';
 import Error from './Error';
 import '../styles/styles.css';
 import SingleArticleInfo from './SingleArticleInfo';
 import Tags from './Tags';
 import Home from './Home';
+import Settings from './Settings';
+import { rootURL } from '../utils/constants';
+import Loader from './Loader';
 
 export default class App extends React.Component {
   constructor(props) {
     super();
     this.state = {
       auth: false,
+      user: null,
+      isVerifying: false,
     };
   }
 
   componentDidMount() {
-    if (localStorage.user) {
+    let token = localStorage.token;
+    if (token) {
       this.setState({
-        auth: true,
+        isVerifying: true,
+      });
+      return fetch(rootURL + 'user', {
+        method: 'get',
+        headers: {
+          Authorization: `Token ${token}`,
+        },
+      })
+        .then((res) => {
+          if (res.ok) {
+            return res.json();
+          } else {
+            return res.json().then((err) => Promise.reject(err));
+          }
+        })
+        .then((data) => this.makeAuthToTrue(data.user))
+        .catch((err) =>
+          this.setState({
+            user: null,
+            auth: false,
+            isVerifying: false,
+          })
+        );
+    } else {
+      this.setState({
+        auth: false,
+        user: null,
+        isVerifying: false,
       });
     }
   }
 
-  makeAuthToTrue = () => {
+  makeAuthToTrue = (user) => {
     this.setState({
       auth: true,
+      user,
+      isVerifying: false,
     });
+    localStorage.setItem('token', user.token);
   };
 
   render() {
+    if (this.state.isVerifying) {
+      return <Loader />;
+    }
     return (
       <>
-        <Header auth={this.state.auth} />
-        <Switch>
-          <Route path="/" exact>
-            <Hero auth={this.state.auth} />
-            <Home auth={this.state.auth} />
-          </Route>
-          <Route path="/articles/:slug" component={SingleArticleInfo} />
-          <Route path="/login">
-            <Login makeAuthToTrue={this.makeAuthToTrue} />
-          </Route>
-          <Route path="/register">
-            <Register makeAuthToTrue={this.makeAuthToTrue} />
-          </Route>
-          <Route path="*">
-            <Error />
-          </Route>
-        </Switch>
+        {this.state.auth ? (
+          <AunthenticatedApp user={this.state.user} auth={this.state.auth} />
+        ) : (
+          <NonAuthenticatedApp
+            auth={this.state.auth}
+            user={this.state.user}
+            makeAuthToTrue={this.makeAuthToTrue}
+          />
+        )}
       </>
     );
   }
+}
+
+function NonAuthenticatedApp(props) {
+  return (
+    <>
+      <Header auth={props.auth} user={props.user} />
+      <Switch>
+        <Route path="/" exact>
+          <Hero auth={props.auth} />
+          <Home auth={props.auth} />
+        </Route>
+        <Route path="/articles/:slug" component={SingleArticleInfo} />
+        <Route path="/login">
+          <Login makeAuthToTrue={props.makeAuthToTrue} />
+        </Route>
+        <Route path="/register">
+          <Register makeAuthToTrue={props.makeAuthToTrue} />
+        </Route>
+        <Route path="*">
+          <Error />
+        </Route>
+      </Switch>
+    </>
+  );
+}
+
+function AunthenticatedApp(props) {
+  return (
+    <>
+      <Header auth={props.auth} user={props.user} />
+      <Switch>
+        <Route path="/" exact>
+          <Hero auth={props.auth} />
+          <Home auth={props.auth} />
+        </Route>
+        <Route path="/articles/:slug" component={SingleArticleInfo} />
+        <Route path="/new_post">
+          <NewArticleForm />
+        </Route>
+        <Route path="/settings">
+          <Settings />
+        </Route>
+        <Route path="*">
+          <Error />
+        </Route>
+      </Switch>
+    </>
+  );
 }

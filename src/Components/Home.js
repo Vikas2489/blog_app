@@ -12,7 +12,7 @@ class Home extends React.Component {
     totalArticles: '',
     isLoading: false,
     selectedPageButton: 1,
-    selectedTab: localStorage.user ? 'feed' : 'global',
+    selectedTab: localStorage.token ? 'feed' : 'global',
   };
   handleGlobalFeed = () => {
     this.setState(() => {
@@ -58,10 +58,11 @@ class Home extends React.Component {
     const offset = (this.state.selectedPageButton - 1) * 10;
 
     if (selectedTab == 'feed') {
-      var { token } = JSON.parse(localStorage.user);
+      var token = localStorage.token;
       this.setState({
         isLoading: true,
       });
+
       return fetch(articlesURL + `/feed?limit=10&offset=${offset}`, {
         method: 'GET',
         headers: {

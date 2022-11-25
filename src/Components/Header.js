@@ -9,9 +9,9 @@ class Header extends React.Component {
   }
 
   render() {
-    var { auth } = this.props;
-    if (localStorage.user) {
-      var { token, username, email } = JSON.parse(localStorage.user);
+    var { auth, user } = this.props;
+    if (user) {
+      var { username, email } = user;
     }
 
     return (
@@ -26,7 +26,7 @@ class Header extends React.Component {
                 Home
               </NavLink>
             </li>
-            {!auth ? (
+            {!user ? (
               <>
                 <li className="text-sm text-[#B3B2B3] hover:text-[#7B7B7A]">
                   <NavLink activeClassName="text-[#7B7B7A]" to="/login">

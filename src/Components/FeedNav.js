@@ -6,7 +6,7 @@ export default class Navbar extends React.Component {
     let { handleGlobalFeed, handleFeed, selectedTab, auth } = this.props;
     return (
       <div>
-        {localStorage.user ? (
+        {localStorage.token ? (
           <p
             className={
               selectedTab == 'feed'
@@ -32,7 +32,8 @@ export default class Navbar extends React.Component {
         </p>
         {selectedTab != null &&
         selectedTab != 'feed' &&
-        selectedTab != 'global' ? (
+        selectedTab != 'global' &&
+        selectedTab != '' ? (
           <p className="p-1 green cursor-pointer px-3 border-b-[1.4px] border-b-solid border-[#5db85c] inline-block -mb-[1px]">
             {selectedTab}
           </p>

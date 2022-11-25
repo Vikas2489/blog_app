@@ -8,8 +8,8 @@ class Login extends React.Component {
   constructor(props) {
     super();
     this.state = {
-      email: '',
-      password: '',
+      email: 'prerna2803.sharma@gmail.com',
+      password: '123456s',
       errors: {
         email: '',
         password: '',
@@ -42,8 +42,7 @@ class Login extends React.Component {
             },
           });
         } else {
-          localStorage.setItem('user', JSON.stringify(data.user));
-          makeAuthToTrue();
+          makeAuthToTrue(data.user);
           this.props.history.push('/');
         }
       });
