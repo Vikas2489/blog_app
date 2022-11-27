@@ -30,10 +30,15 @@ export default class SingleArticle extends React.Component {
                 <img
                   className="w-10 h-10 rounded-full"
                   src={author.image}
-                  alt=""
+                  alt={author.username}
                 />
                 <div className="ml-1">
-                  <h4 className="text-[#F1F0F0] text-sm">{author.username}</h4>
+                  <NavLink
+                    to={'/profile/' + author.username}
+                    className="text-[#F1F0F0] text-sm"
+                  >
+                    {author.username}
+                  </NavLink>
                   <p className="text-[#CECECF] text-xs font-thin">
                     {new Date(`${createdAt}`).toDateString()}
                   </p>
@@ -58,16 +63,7 @@ export default class SingleArticle extends React.Component {
               </div>
               <hr />
             </article>
-            <p className="ml-7 my-4 text-sm">
-              <NavLink to="/login">
-                <span className="green"> Sign in </span>
-              </NavLink>
-              or
-              <NavLink to="/register">
-                <span className="green"> Sign up </span>
-              </NavLink>
-              to add comments on this article.
-            </p>
+            {<RegisterOrLogin token={localStorage.token} />}
           </div>
         </>
       );
@@ -79,4 +75,20 @@ export default class SingleArticle extends React.Component {
       );
     }
   }
+}
+
+function RegisterOrLogin(props) {
+  if (!props.token) {
+    <p className="ml-7 my-4 text-sm">
+      <NavLink to="/login">
+        <span className="green"> Sign in </span>
+      </NavLink>
+      or
+      <NavLink to="/register">
+        <span className="green"> Sign up </span>
+      </NavLink>
+      to add comments on this article.
+    </p>;
+  }
+  return;
 }

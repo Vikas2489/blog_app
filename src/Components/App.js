@@ -6,7 +6,7 @@ import Register from './Register';
 import { Switch } from 'react-router';
 import { Route, Redirect } from 'react-router';
 import Articles from './Articles';
-import NewArticleForm from './NewArticleForm';
+import NewArticlePost from './NewArticlePost';
 import Error from './Error';
 import '../styles/styles.css';
 import SingleArticleInfo from './SingleArticleInfo';
@@ -15,6 +15,7 @@ import Home from './Home';
 import Settings from './Settings';
 import { rootURL } from '../utils/constants';
 import Loader from './Loader';
+import Profile from './Profile';
 
 export default class App extends React.Component {
   constructor(props) {
@@ -69,6 +70,15 @@ export default class App extends React.Component {
       isVerifying: false,
     });
     localStorage.setItem('token', user.token);
+    localStorage.setItem('username', user.username);
+  };
+
+  makeAuthToFalse = () => {
+    this.setState({
+      auth: false,
+      user: null,
+      isVerifying: false,
+    });
   };
 
   render() {
@@ -78,7 +88,12 @@ export default class App extends React.Component {
     return (
       <>
         {this.state.auth ? (
-          <AunthenticatedApp user={this.state.user} auth={this.state.auth} />
+          <AunthenticatedApp
+            user={this.state.user}
+            makeAuthToFalse={this.makeAuthToFalse}
+            makeAuthToTrue={this.makeAuthToTrue}
+            auth={this.state.auth}
+          />
         ) : (
           <NonAuthenticatedApp
             auth={this.state.auth}
@@ -107,6 +122,7 @@ function NonAuthenticatedApp(props) {
         <Route path="/register">
           <Register makeAuthToTrue={props.makeAuthToTrue} />
         </Route>
+
         <Route path="*">
           <Error />
         </Route>
@@ -124,12 +140,21 @@ function AunthenticatedApp(props) {
           <Hero auth={props.auth} />
           <Home auth={props.auth} />
         </Route>
-        <Route path="/articles/:slug" component={SingleArticleInfo} />
+        <Route path="/profile/:username" component={Profile} />
+        <Route
+          path="/articles/:slug"
+          user={props.user}
+          component={SingleArticleInfo}
+        />
         <Route path="/new_post">
-          <NewArticleForm />
+          <NewArticlePost />
         </Route>
         <Route path="/settings">
-          <Settings />
+          <Settings
+            user={props.user}
+            makeAuthToTrue={props.makeAuthToTrue}
+            makeAuthToFalse={props.makeAuthToFalse}
+          />
         </Route>
         <Route path="*">
           <Error />

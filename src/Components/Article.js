@@ -16,15 +16,23 @@ export default class Article extends React.Component {
       >
         <div className="flex my-5 justify-between">
           <div className="flex items-center">
-            <img
-              className="w-10 h-10 rounded-full "
-              src={article.author.image}
-              alt={'pic_' + i}
-            />
+            <NavLink
+              to={`/profile/${article.author.username}`}
+              className="text-green-500 text-sm"
+            >
+              <img
+                className="w-10 h-10 rounded-full "
+                src={article.author.image || '/smiley.png'}
+                alt={'pic_' + i}
+              />
+            </NavLink>
             <div className="ml-4">
-              <h4 className="text-green-500 text-sm">
+              <NavLink
+                to={`/profile/${article.author.username}`}
+                className="text-green-500 text-sm"
+              >
                 {article.author.username}
-              </h4>
+              </NavLink>
               <p className="text-[#CECECF] text-xs font-thin">
                 {new Date(`${article.createdAt}`).toDateString()}
               </p>

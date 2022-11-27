@@ -33,7 +33,7 @@ function handleEmailError(value) {
   return;
 }
 
-function handlePasswordError(value) {
+export function handlePasswordError(value) {
   if (!value) {
     return 'password cannot be blank';
   } else if (value.length < 6) {
