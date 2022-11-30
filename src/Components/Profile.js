@@ -6,6 +6,8 @@ import ProfileFeedNav from './ProfileFeedNav';
 import Articles from './Articles';
 import Pagination from './Pagination';
 import Loader from './Loader';
+import { Link } from 'react-router-dom';
+import { withRouter } from 'react-router';
 
 class Profile extends React.Component {
   constructor(props) {
@@ -17,6 +19,7 @@ class Profile extends React.Component {
       articlesCount: 0,
       selectedPageButton: 1,
       isLoading: false,
+      showFollowOrUnfollow: '',
     };
   }
 
@@ -24,6 +27,25 @@ class Profile extends React.Component {
     this.setState({
       selectedTab: activeTab,
     });
+  };
+
+  handleFollowOrUnfollow = (username) => {
+    return fetch(rootURL + `profiles/${username}/follow`, {
+      method: this.state.showFollowOrUnfollow == 'follow' ? 'post' : 'delete',
+      headers: {
+        Authorization: `Token ${localStorage.token}`,
+      },
+    })
+      .then((res) =>
+        res.json().then((data) => {
+          console.log(data, 'after');
+          let { following } = data.profile;
+          this.setState({
+            showFollowOrUnfollow: following == true ? 'unfollow' : 'follow',
+          });
+        })
+      )
+      .catch((err) => console.log(err));
   };
 
   componentDidUpdate(_prevprops, prevState) {
@@ -37,6 +59,29 @@ class Profile extends React.Component {
 
   componentDidMount() {
     this.fetchArticles();
+    if (this.props.match.params.username != this.props.user.username) {
+      fetch(rootURL + `/profiles/${this.props.match.params.username}`, {
+        method: 'get',
+        headers: {
+          Authorization: `Token ${localStorage.token}`,
+        },
+      })
+        .then((res) => {
+          if (res.ok) {
+            return res.json();
+          } else {
+            res.json().then((err) => Promise.reject(err));
+          }
+        })
+        .then((data) => {
+          return this.setState({
+            showFollowOrUnfollow: data.profile.following
+              ? 'unfollow'
+              : 'follow',
+          });
+        })
+        .catch((err) => console.log(err));
+    }
   }
 
   fetchArticles = () => {
@@ -50,7 +95,12 @@ class Profile extends React.Component {
       url = articlesURL + `?favorited=${username}&limit=10&offset=${offset}?`;
     }
     this.setState({ isLoading: true });
-    fetch(url)
+    fetch(url, {
+      method: 'get',
+      headers: {
+        Authorization: `Token ${localStorage.token}`,
+      },
+    })
       .then((res) => {
         if (res.ok) {
           return res.json();
@@ -87,6 +137,56 @@ class Profile extends React.Component {
     return arrOfPagination;
   };
 
+  handlefavOrUnfav = (slug, favorited, index) => {
+    console.log(slug, favorited, index);
+    if (!favorited) {
+      return fetch(articlesURL + `/${slug}/favorite`, {
+        method: 'post',
+        headers: {
+          Authorization: `Token ${localStorage.token}`,
+        },
+      })
+        .then((res) => {
+          if (res.ok) {
+            return res.json();
+          } else {
+            return res.json().then((err) => Promise.reject(err));
+          }
+        })
+        .then((data) => {
+          let { article } = data;
+          this.setState({
+            articlesArr: this.state.articlesArr.map((a, i) => {
+              if (i == index) {
+                return (a = article);
+              } else {
+                return a;
+              }
+            }),
+          });
+        })
+        .catch((err) => console.log(err));
+    } else if (favorited) {
+      return fetch(articlesURL + `/${slug}/favorite`, {
+        method: 'delete',
+        headers: {
+          Authorization: `Token ${localStorage.token}`,
+        },
+      })
+        .then((res) => {
+          if (res.ok) {
+            return res.json();
+          } else {
+            return res.json().then((err) => Promise.reject(err));
+          }
+        })
+        .then((data) => {
+          this.fetchArticles();
+        })
+        .catch((err) => console.log(err));
+    }
+  };
+
   render() {
     let arrOfButton = this.pagination();
     return (
@@ -111,12 +211,20 @@ class Profile extends React.Component {
                   Edit Profile Settings
                 </NavLink>
               ) : (
-                <NavLink
-                  to="/follow"
+                <button
+                  type="button"
+                  disabled={!this.state.showFollowOrUnfollow == true}
+                  onClick={() =>
+                    this.handleFollowOrUnfollow(
+                      this.props.match.params.username
+                    )
+                  }
                   className="text-[#9B9A9B] flex justify-center items-center hover:bg-slate-200 rounded font-thin text-xs border-[1px] border-solid border-[#9B9A9B] py-1 px-3"
                 >
-                  {'follow ' + this.props.match.params.username}
-                </NavLink>
+                  {this.state.showFollowOrUnfollow +
+                    ' ' +
+                    this.props.match.params.username}
+                </button>
               )}
             </div>
           </div>
@@ -131,18 +239,20 @@ class Profile extends React.Component {
           </div>
         ) : (
           <div className="w-[800px] p-[32px] mx-auto my-0">
-            <Articles articlesArr={this.state.articlesArr} />
+            <Articles
+              articlesArr={this.state.articlesArr}
+              handlefavOrUnfav={this.handlefavOrUnfav}
+            />
+            <Pagination
+              arrOfButton={arrOfButton}
+              handleClickOnPageButton={this.handleClickOnPageButton}
+              selectedPageButton={this.state.selectedPageButton}
+            />
           </div>
         )}
-
-        <Pagination
-          arrOfButton={arrOfButton}
-          handleClickOnPageButton={this.handleClickOnPageButton}
-          selectedPageButton={this.state.selectedPageButton}
-        />
       </>
     );
   }
 }
 
-export default Profile;
+export default withRouter(Profile);

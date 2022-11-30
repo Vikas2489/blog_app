@@ -1,14 +1,16 @@
 import React from 'react';
 import { AiFillHeart } from 'react-icons/ai';
 import { FaSmileWink } from 'react-icons/fa';
+import { articlesURL, rootURL } from '../utils/constants';
 import { NavLink } from 'react-router-dom';
 
 export default class Article extends React.Component {
   constructor(props) {
     super(props);
   }
+
   render() {
-    let { article, i } = this.props;
+    let { article, i, handlefavOrUnfav } = this.props;
     return (
       <article
         key={article.slug}
@@ -40,7 +42,12 @@ export default class Article extends React.Component {
           </div>
           <button
             type="button"
-            className="green border-[1.5px] h-6 w-9 text-sm p-1 hover:bg-green-500 hover:text-white rounded flex border-green-500 items-center"
+            onClick={() => handlefavOrUnfav(article.slug, article.favorited, i)}
+            className={
+              article.favorited
+                ? 'border-[1.5px] h-6 w-9 text-sm p-1 bg-green-500 text-white hover:bg-green-600 rounded flex border-green-500 items-center'
+                : 'green border-[1.5px] h-6 w-9 text-sm p-1 hover:bg-green-500 hover:text-white rounded flex border-green-500 items-center'
+            }
           >
             <AiFillHeart />
             <span className="ml-1 tex">{article.favoritesCount}</span>

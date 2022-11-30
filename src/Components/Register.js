@@ -48,7 +48,6 @@ class Register extends React.Component {
           },
         });
       } else {
-        // localStorage.setItem('user', JSON.stringify(data.user));
         makeAuthToTrue(data.user);
         this.props.history.push('/');
       }

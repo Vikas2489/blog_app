@@ -16,6 +16,7 @@ import Settings from './Settings';
 import { rootURL } from '../utils/constants';
 import Loader from './Loader';
 import Profile from './Profile';
+import EditArticle from './EditArticle';
 
 export default class App extends React.Component {
   constructor(props) {
@@ -115,7 +116,9 @@ function NonAuthenticatedApp(props) {
           <Hero auth={props.auth} />
           <Home auth={props.auth} />
         </Route>
-        <Route path="/articles/:slug" component={SingleArticleInfo} />
+        <Route path="/articles/:slug">
+          <SingleArticleInfo user={props.user} />
+        </Route>
         <Route path="/login">
           <Login makeAuthToTrue={props.makeAuthToTrue} />
         </Route>
@@ -140,12 +143,15 @@ function AunthenticatedApp(props) {
           <Hero auth={props.auth} />
           <Home auth={props.auth} />
         </Route>
-        <Route path="/profile/:username" component={Profile} />
-        <Route
-          path="/articles/:slug"
-          user={props.user}
-          component={SingleArticleInfo}
-        />
+        <Route path="/profile/:username">
+          <Profile user={props.user} />
+        </Route>
+        <Route path="/edit/:slug">
+          <EditArticle />
+        </Route>
+        <Route path="/articles/:slug">
+          <SingleArticleInfo user={props.user} />
+        </Route>
         <Route path="/new_post">
           <NewArticlePost />
         </Route>

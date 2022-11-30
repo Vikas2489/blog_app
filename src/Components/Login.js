@@ -8,8 +8,8 @@ class Login extends React.Component {
   constructor(props) {
     super();
     this.state = {
-      email: 'prerna2803.sharma@gmail.com',
-      password: '123456s',
+      email: '',
+      password: '',
       errors: {
         email: '',
         password: '',
@@ -38,7 +38,7 @@ class Login extends React.Component {
           this.setState({
             errors: {
               ...data.errors,
-              email: 'email or password is invalid',
+              password: 'email or password is invalid',
             },
           });
         } else {

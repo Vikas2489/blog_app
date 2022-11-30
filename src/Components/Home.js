@@ -66,7 +66,6 @@ class Home extends React.Component {
       return fetch(articlesURL + `/feed?limit=10&offset=${offset}`, {
         method: 'GET',
         headers: {
-          'content-type': 'application/json',
           Authorization: `Token ${token}`,
         },
       })
@@ -94,7 +93,13 @@ class Home extends React.Component {
           `?limit=10&offset=${offset}` +
           (selectedTab != null && selectedTab != 'global'
             ? `&tag=${selectedTab}`
-            : '')
+            : ''),
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Token ${localStorage.token}`,
+          },
+        }
       )
         .then((res) => {
           if (res.ok) {
@@ -124,6 +129,64 @@ class Home extends React.Component {
     return this.setState({ selectedTab: tag, selectedPageButton: 1 });
   };
 
+  handlefavOrUnfav = (slug, favorited, index) => {
+    if (!favorited) {
+      return fetch(articlesURL + `/${slug}/favorite`, {
+        method: 'post',
+        headers: {
+          Authorization: `Token ${localStorage.token}`,
+        },
+      })
+        .then((res) => {
+          if (res.ok) {
+            return res.json();
+          } else {
+            return res.json().then((err) => Promise.reject(err));
+          }
+        })
+        .then((data) => {
+          let { article } = data;
+          this.setState({
+            articlesArr: this.state.articlesArr.map((a, i) => {
+              if (i == index) {
+                return (a = article);
+              } else {
+                return a;
+              }
+            }),
+          });
+        })
+        .catch((err) => console.log(err));
+    } else if (favorited) {
+      return fetch(articlesURL + `/${slug}/favorite`, {
+        method: 'delete',
+        headers: {
+          Authorization: `Token ${localStorage.token}`,
+        },
+      })
+        .then((res) => {
+          if (res.ok) {
+            return res.json();
+          } else {
+            return res.json().then((err) => Promise.reject(err));
+          }
+        })
+        .then((data) => {
+          let { article } = data;
+          this.setState({
+            articlesArr: this.state.articlesArr.map((a, i) => {
+              if (i == index) {
+                return (a = article);
+              } else {
+                return a;
+              }
+            }),
+          });
+        })
+        .catch((err) => console.log(err));
+    }
+  };
+
   render() {
     let {
       articlesArr,
@@ -148,7 +211,11 @@ class Home extends React.Component {
             {isLoading ? (
               <Loader />
             ) : (
-              <Articles articlesArr={articlesArr} isLoading={isLoading} />
+              <Articles
+                articlesArr={articlesArr}
+                isLoading={isLoading}
+                handlefavOrUnfav={this.handlefavOrUnfav}
+              />
             )}
             {!isLoading ? (
               <Pagination

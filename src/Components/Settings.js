@@ -1,7 +1,7 @@
 import React from 'react';
-
 import { rootURL } from '../utils/constants';
 import { handlePasswordError } from '../utils/validate';
+import { withRouter } from 'react-router-dom';
 
 class Settings extends React.Component {
   constructor(props) {
@@ -210,4 +210,4 @@ class Settings extends React.Component {
   }
 }
 
-export default Settings;
+export default withRouter(Settings);

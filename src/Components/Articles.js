@@ -11,12 +11,19 @@ class Articles extends React.Component {
   }
 
   render() {
-    let { articlesArr } = this.props;
+    let { articlesArr, handlefavOrUnfav } = this.props;
     return (
       <section>
         {articlesArr.length > 0 ? (
           articlesArr.map((article, i) => {
-            return <Article key={article.slug} article={article} i={i} />;
+            return (
+              <Article
+                key={article.slug}
+                article={article}
+                i={i}
+                handlefavOrUnfav={handlefavOrUnfav}
+              />
+            );
           })
         ) : (
           <div className="flex justify-center my-4">

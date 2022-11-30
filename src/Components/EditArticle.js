@@ -1,8 +1,8 @@
 import React from 'react';
-import { articlesURL } from '../utils/constants';
 import { withRouter } from 'react-router';
+import { articlesURL } from '../utils/constants';
 
-class NewArticlePost extends React.Component {
+class EditArticle extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -10,6 +10,7 @@ class NewArticlePost extends React.Component {
       description: '',
       body: '',
       tagList: [],
+      isUpdating: false,
       errors: {
         title: '',
         description: '',
@@ -17,6 +18,27 @@ class NewArticlePost extends React.Component {
       },
     };
   }
+
+  componentDidMount = () => {
+    let { slug } = this.props.match.params;
+    return fetch(articlesURL + `/${slug}`)
+      .then((res) => {
+        if (res.ok) {
+          return res.json();
+        } else {
+          return res.json().then((err) => Promise.reject(err));
+        }
+      })
+      .then((data) => {
+        let { title, description, body, tagList } = data.article;
+        this.setState({
+          title,
+          description,
+          body,
+          tagList,
+        });
+      });
+  };
 
   handleChange = ({ target }) => {
     let { name, value } = target;
@@ -51,8 +73,9 @@ class NewArticlePost extends React.Component {
   handleSubmit = (e) => {
     let { title, description, body, tagList, errors } = this.state;
     e.preventDefault();
-    fetch(articlesURL, {
-      method: 'POST',
+    this.setState({ isUpdating: true });
+    fetch(articlesURL + `/${this.props.match.params.slug}`, {
+      method: 'PUT',
       headers: {
         'content-type': 'application/json',
         Authorization: `Token ${localStorage.token}`,
@@ -74,12 +97,14 @@ class NewArticlePost extends React.Component {
         }
       })
       .then((data) => {
-        this.props.history.push(`articles/${data.article.slug}`);
+        this.setState({ isUpdating: false });
+        this.props.history.push(`/articles/${data.article.slug}`);
       })
       .catch((error) => console.log(error));
   };
+
   render() {
-    let { errors } = this.state;
+    let { errors, isUpdating } = this.state;
     return (
       <div className="w-[700px] mx-auto my-0">
         <form
@@ -156,8 +181,10 @@ class NewArticlePost extends React.Component {
             <input
               type="submit"
               className="bg_green btn-login rounded text-white py-3 px-6 my-4"
-              disabled={errors.title || errors.body || errors.description}
-              value="Publish Article"
+              disabled={
+                errors.title || errors.body || errors.description || isUpdating
+              }
+              value={isUpdating ? 'Updating...' : 'Update Article'}
             />
           </div>
         </form>
@@ -166,4 +193,4 @@ class NewArticlePost extends React.Component {
   }
 }
 
-export default withRouter(NewArticlePost);
+export default withRouter(EditArticle);
