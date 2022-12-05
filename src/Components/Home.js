@@ -105,7 +105,7 @@ class Home extends React.Component {
           if (res.ok) {
             return res.json();
           } else {
-            throw new Error('something went wrong');
+            return res.json().then((err) => Promise.reject(err));
           }
         })
         .then((data) => {
@@ -115,7 +115,12 @@ class Home extends React.Component {
             isLoading: false,
           });
         })
-        .catch((err) => console.log(err));
+        .catch((err) => {
+          console.log(err);
+          return this.setState({
+            isLoading: false,
+          });
+        });
     }
   };
 
@@ -199,7 +204,7 @@ class Home extends React.Component {
     let arrOfButton = this.pagination();
     return (
       <>
-        <section className="container flex flex-wrap justify-between">
+        <section className="container flex flex-wrap sm_flex_col justify-between">
           <article className="basis-[72%]">
             <FeedNav
               handleFeed={this.handleFeed}
