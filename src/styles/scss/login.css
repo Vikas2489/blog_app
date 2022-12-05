@@ -1,0 +1,17 @@
+@media only screen and (max-width: 768px) {
+  .padding_sm {
+    padding: 1rem;
+  }
+}
+@media only screen and (max-width: 534px) {
+  .padding_sm {
+    padding: 1rem;
+  }
+  .sm_container {
+    max-width: 100%;
+    width: 500px;
+    padding: 1rem;
+    margin: 0 auto;
+    position: relative;
+  }
+}/*# sourceMappingURL=login.css.map */

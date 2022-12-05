@@ -52,7 +52,7 @@ class Login extends React.Component {
   render() {
     let { email, password } = this.state.errors;
     return (
-      <section className="w-[560px] mx-auto my-0">
+      <section className="w-[560px] padding_sm mx-auto my-0">
         <div>
           <h2 className="text-center text-[#373B3D] text-3xl">Sign In</h2>
           <NavLink
@@ -67,6 +67,7 @@ class Login extends React.Component {
           action="/api/users/login"
           method="post"
           onSubmit={this.handleSubmit}
+          className="sm_container"
         >
           <input
             type="email"

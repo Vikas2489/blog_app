@@ -17,6 +17,8 @@ import { rootURL } from '../utils/constants';
 import Loader from './Loader';
 import Profile from './Profile';
 import EditArticle from './EditArticle';
+import '../styles/scss/header.scss';
+import '../styles/scss/login.scss';
 
 export default class App extends React.Component {
   constructor(props) {
