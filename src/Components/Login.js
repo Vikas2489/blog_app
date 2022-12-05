@@ -1,8 +1,10 @@
+import { data } from 'autoprefixer';
 import React from 'react';
-import { NavLink } from 'react-router-dom';
-import validate from '../utils/validate';
+import { NavLink, withRouter } from 'react-router-dom';
+import { rootURL } from '../utils/constants';
+import { validate, registerOrLogin } from '../utils/validate';
 
-export default class Login extends React.Component {
+class Login extends React.Component {
   constructor(props) {
     super();
     this.state = {
@@ -27,7 +29,24 @@ export default class Login extends React.Component {
 
   handleSubmit = (e) => {
     e.preventDefault();
-    let { email, username, password } = this.state.errors;
+    let { makeAuthToTrue } = this.props;
+    let { email, password } = this.state;
+    let errors = { ...this.state.errors };
+    if (email && password) {
+      registerOrLogin('login', email, '', password).then((data) => {
+        if (data.errors) {
+          this.setState({
+            errors: {
+              ...data.errors,
+              password: 'email or password is invalid',
+            },
+          });
+        } else {
+          makeAuthToTrue(data.user);
+          this.props.history.push('/');
+        }
+      });
+    }
   };
 
   render() {
@@ -43,12 +62,7 @@ export default class Login extends React.Component {
             Need an account?
           </NavLink>
         </div>
-        <div className="flex items-center">
-          {password || email ? <div className="dot"></div> : ''}
-          <span className="text-[#b95d5c] text-xs font-semibold">
-            {password || email}
-          </span>
-        </div>
+
         <form
           action="/api/users/login"
           method="post"
@@ -62,6 +76,12 @@ export default class Login extends React.Component {
             onChange={this.handleChange}
             className="border-[1px] my-4 w-full rounded block bg-transparent  border-[#D9D8D8] border-solid py-2 px-3 placeholder:font-normal placeholder:text-[#999898]"
           />
+          <div className="flex items-center">
+            {email ? <div className="dot"></div> : ''}
+            <span className="text-[#b95d5c] text-xs font-semibold">
+              {email}
+            </span>
+          </div>
           <input
             type="password"
             name="password"
@@ -70,6 +90,12 @@ export default class Login extends React.Component {
             onChange={this.handleChange}
             className="border-[1px] w-full rounded block bg-transparent border-[#D9D8D8] border-solid py-2 px-3 placeholder:font-normal placeholder:text-[#999898]"
           />
+          <div className="flex items-center">
+            {password ? <div className="dot"></div> : ''}
+            <span className="text-[#b95d5c] text-xs font-semibold">
+              {password}
+            </span>
+          </div>
           <div className="text-right">
             <input
               type="submit"
@@ -83,3 +109,5 @@ export default class Login extends React.Component {
     );
   }
 }
+
+export default withRouter(Login);

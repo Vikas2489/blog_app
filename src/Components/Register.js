@@ -1,8 +1,10 @@
+import { data } from 'autoprefixer';
 import React from 'react';
-import { NavLink } from 'react-router-dom';
-import validate from '../utils/validate';
+import { NavLink, withRouter } from 'react-router-dom';
+import { rootURL } from '../utils/constants';
+import { registerOrLogin, validate } from '../utils/validate';
 
-export default class Register extends React.Component {
+class Register extends React.Component {
   constructor(props) {
     super();
     this.state = {
@@ -29,7 +31,27 @@ export default class Register extends React.Component {
 
   handleSubmit = (e) => {
     e.preventDefault();
-    let { email, username, password } = this.state.errors;
+    let { makeAuthToTrue } = this.props;
+    let { email, username, password } = this.state;
+    let errors = { ...this.state.errors };
+
+    registerOrLogin('register', email, username, password).then((data) => {
+      console.log(data, 'errors, data');
+      if (data.errors) {
+        this.setState({
+          errors: {
+            username: data.errors.username
+              ? 'username ' + data.errors.username
+              : '',
+            email: data.errors.email ? 'email ' + data.errors.email : '',
+            password: !this.state.password ? 'password cannot be blank' : '',
+          },
+        });
+      } else {
+        makeAuthToTrue(data.user);
+        this.props.history.push('/');
+      }
+    });
   };
 
   render() {
@@ -64,7 +86,7 @@ export default class Register extends React.Component {
             type="email"
             name="email"
             placeholder="Email"
-            onChange={this.handleChange}
+            onChange={(e) => this.handleChange(e)}
             value={this.state.email}
             className="border-[1px] my-2 w-full rounded block bg-transparent border-[#D9D8D8] border-solid py-2 px-3 placeholder:font-normal placeholder:text-[#999898]"
           />
@@ -91,6 +113,7 @@ export default class Register extends React.Component {
           <div className="text-right">
             <input
               type="submit"
+              onSubmit={this.handleSubmit}
               value="Sign up"
               disabled={username || email || password}
               className="bg_green btn-register rounded text-white py-3 px-6 my-3"
@@ -101,3 +124,5 @@ export default class Register extends React.Component {
     );
   }
 }
+
+export default withRouter(Register);
