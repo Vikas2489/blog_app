@@ -17,10 +17,11 @@
   }
   #menu:checked ~ .sm_navlinks {
     display: flex;
+    z-index: 999;
     justify-content: center;
     flex-direction: column;
     border-radius: 0.3rem;
-    background-color: #80c07f;
+    background-color: rgba(190, 197, 186, 0.9215686275);
     width: 100px;
     height: auto;
     position: absolute;
