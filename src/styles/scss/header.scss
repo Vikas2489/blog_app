@@ -22,6 +22,7 @@
     }
     #menu:checked~.sm_navlinks {
         display: flex;
+        z-index: 999;
         justify-content: center;
         flex-direction: column;
         border-radius: 0.3rem;
