@@ -57,7 +57,7 @@ class Register extends React.Component {
   render() {
     let { username, email, password } = this.state.errors;
     return (
-      <section className="w-[560px] mx-auto my-0">
+      <section className="w-[560px] sm_container mx-auto my-0 p-[1rem]">
         <div>
           <h2 className="text-center text-[#373B3D] text-3xl">Sign Up</h2>
           <NavLink
