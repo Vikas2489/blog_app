@@ -12,26 +12,28 @@ class Articles extends React.Component {
 
   render() {
     let { articlesArr, handlefavOrUnfav } = this.props;
-    return (
+    if (articlesArr.length > 0) {
       <section>
-        {articlesArr.length > 0 ? (
-          articlesArr.map((article, i) => {
-            return (
-              <Article
-                key={article.slug}
-                article={article}
-                i={i}
-                handlefavOrUnfav={handlefavOrUnfav}
-              />
-            );
-          })
-        ) : (
+        {articlesArr.map((article, i) => {
+          return (
+            <Article
+              key={article.slug}
+              article={article}
+              i={i}
+              handlefavOrUnfav={handlefavOrUnfav}
+            />
+          );
+        })}
+      </section>;
+    } else {
+      return (
+        <section>
           <div className="flex justify-center my-4">
             <p className="text-sm text-red-600 ">No articles found!</p>
           </div>
-        )}
-      </section>
-    );
+        </section>
+      );
+    }
   }
 }
 
