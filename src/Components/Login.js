@@ -52,7 +52,7 @@ class Login extends React.Component {
   render() {
     let { email, password } = this.state.errors;
     return (
-      <section className="w-[560px] padding_sm mx-auto my-0">
+      <section className="w-auto padding_sm mx-auto my-0">
         <div>
           <h2 className="text-center text-[#373B3D] text-3xl">Sign In</h2>
           <NavLink
