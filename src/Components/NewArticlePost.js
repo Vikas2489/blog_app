@@ -55,15 +55,13 @@ class NewArticlePost extends React.Component {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
-        Authorization: `Token ${localStorage.token}`,
+        Authorization: `${localStorage.token}`,
       },
       body: JSON.stringify({
-        article: {
-          title,
-          description,
-          body,
-          tagList,
-        },
+        title,
+        description,
+        body,
+        taglist: tagList,
       }),
     })
       .then((res) => {
@@ -74,9 +72,29 @@ class NewArticlePost extends React.Component {
         }
       })
       .then((data) => {
-        this.props.history.push(`articles/${data.article.slug}`);
+        if (data.errors) {
+          let { title, description, body } = data.errors;
+          return this.setState({
+            errors: {
+              title,
+              description,
+              body,
+            },
+          });
+        } else if (data.article) {
+          this.props.history.push(`articles/${data.article.slug}`);
+        }
       })
-      .catch((error) => console.log(error));
+      .catch((error) => {
+        let { title, description, body } = error.errors;
+        return this.setState({
+          errors: {
+            title,
+            description,
+            body,
+          },
+        });
+      });
   };
   render() {
     let { errors } = this.state;

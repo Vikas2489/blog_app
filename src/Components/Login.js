@@ -10,6 +10,7 @@ class Login extends React.Component {
     this.state = {
       email: '',
       password: '',
+      loggingIn: false,
       errors: {
         email: '',
         password: '',
@@ -32,21 +33,27 @@ class Login extends React.Component {
     let { makeAuthToTrue } = this.props;
     let { email, password } = this.state;
     let errors = { ...this.state.errors };
-    if (email && password) {
-      registerOrLogin('login', email, '', password).then((data) => {
-        if (data.errors) {
-          this.setState({
-            errors: {
-              ...data.errors,
-              password: 'email or password is invalid',
-            },
-          });
-        } else {
-          makeAuthToTrue(data.user);
-          this.props.history.push('/');
-        }
-      });
-    }
+
+    this.setState({
+      loggingIn: true,
+    });
+
+    registerOrLogin('login', email, '', password).then((data) => {
+      if (data.errors) {
+        this.setState({
+          loggingIn: false,
+          errors: {
+            ...data.errors,
+          },
+        });
+      } else {
+        this.setState({
+          loggingIn: false,
+        });
+        makeAuthToTrue(data.user);
+        this.props.history.push('/');
+      }
+    });
   };
 
   render() {
@@ -101,8 +108,12 @@ class Login extends React.Component {
             <input
               type="submit"
               className="bg_green btn-login rounded text-white py-3 px-6 my-4"
-              disabled={this.state.errors.email || this.state.errors.password}
-              value="Sign In"
+              disabled={
+                this.state.errors.email ||
+                this.state.errors.password ||
+                this.state.loggingIn
+              }
+              value={this.state.loggingIn ? 'Signing In...' : 'Sign In'}
             />
           </div>
         </form>

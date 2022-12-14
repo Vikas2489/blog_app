@@ -9,7 +9,7 @@ class EditArticle extends React.Component {
       title: '',
       description: '',
       body: '',
-      tagList: [],
+      taglist: [],
       isUpdating: false,
       errors: {
         title: '',
@@ -30,12 +30,12 @@ class EditArticle extends React.Component {
         }
       })
       .then((data) => {
-        let { title, description, body, tagList } = data.article;
+        let { title, description, body, taglist } = data.article;
         this.setState({
           title,
           description,
           body,
-          tagList,
+          taglist,
         });
       });
   };
@@ -56,7 +56,7 @@ class EditArticle extends React.Component {
       default:
         break;
     }
-    if (name == 'tagList') {
+    if (name == 'taglist') {
       return this.setState({
         [name]: value
           .trim()
@@ -71,22 +71,20 @@ class EditArticle extends React.Component {
   };
 
   handleSubmit = (e) => {
-    let { title, description, body, tagList, errors } = this.state;
+    let { title, description, body, taglist, errors } = this.state;
     e.preventDefault();
     this.setState({ isUpdating: true });
     fetch(articlesURL + `/${this.props.match.params.slug}`, {
       method: 'PUT',
       headers: {
         'content-type': 'application/json',
-        Authorization: `Token ${localStorage.token}`,
+        Authorization: `${localStorage.token}`,
       },
       body: JSON.stringify({
-        article: {
-          title,
-          description,
-          body,
-          tagList,
-        },
+        title,
+        description,
+        body,
+        taglist,
       }),
     })
       .then((res) => {
@@ -98,7 +96,7 @@ class EditArticle extends React.Component {
       })
       .then((data) => {
         this.setState({ isUpdating: false });
-        this.props.history.push(`/articles/${data.article.slug}`);
+        this.props.history.push(`/articles/${data.updatedArticle.slug}`);
       })
       .catch((error) => console.log(error));
   };
@@ -171,8 +169,8 @@ class EditArticle extends React.Component {
           <input
             type="text"
             placeholder="Enter Tags"
-            name="tagList"
-            value={this.state.tagList}
+            name="taglist"
+            value={this.state.taglist}
             onChange={this.handleChange}
             className="border-[1px] w-full rounded block bg-transparent border-[#D9D8D8] border-solid py-2 px-3 mt-1 placeholder:font-normal placeholder:text-[#999898]"
           />

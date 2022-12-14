@@ -30,7 +30,7 @@ class Home extends React.Component {
   }
 
   componentDidMount() {
-    return this.fetchArticles();
+    this.fetchArticles();
   }
 
   pagination = () => {
@@ -58,22 +58,20 @@ class Home extends React.Component {
     const offset = (this.state.selectedPageButton - 1) * 10;
 
     if (selectedTab == 'feed') {
-      var token = localStorage.token;
       this.setState({
         isLoading: true,
       });
-
       return fetch(articlesURL + `/feed?limit=10&offset=${offset}`, {
         method: 'GET',
         headers: {
-          Authorization: `Token ${token}`,
+          Authorization: `${localStorage.token}`,
         },
       })
         .then((res) => {
           if (res.ok) {
             return res.json();
           } else {
-            throw new Error('something went wrong');
+            return res.json().then((err) => Promise.reject(err));
           }
         })
         .then((data) => {
@@ -83,21 +81,25 @@ class Home extends React.Component {
             isLoading: false,
           });
         })
-        .catch((err) => console.log(err));
+        .catch((err) =>
+          this.setState({
+            isLoading: false,
+          })
+        );
     } else {
       this.setState({
         isLoading: true,
       });
-      return fetch(
+      fetch(
         articlesURL +
           `?limit=10&offset=${offset}` +
           (selectedTab != null && selectedTab != 'global'
-            ? `&tag=${selectedTab}`
+            ? `&taglist=${selectedTab}`
             : ''),
         {
           method: 'GET',
           headers: {
-            Authorization: `Token ${localStorage.token}`,
+            Authorization: `${localStorage.token}`,
           },
         }
       )
@@ -116,7 +118,6 @@ class Home extends React.Component {
           });
         })
         .catch((err) => {
-          console.log(err);
           return this.setState({
             isLoading: false,
           });
@@ -134,12 +135,12 @@ class Home extends React.Component {
     return this.setState({ selectedTab: tag, selectedPageButton: 1 });
   };
 
-  handlefavOrUnfav = (slug, favorited, index) => {
-    if (!favorited) {
-      return fetch(articlesURL + `/${slug}/favorite`, {
+  handlefavOrUnfav = (slug, favourited, index) => {
+    if (!favourited) {
+      return fetch(articlesURL + `/${slug}/favourite`, {
         method: 'post',
         headers: {
-          Authorization: `Token ${localStorage.token}`,
+          Authorization: `${localStorage.token}`,
         },
       })
         .then((res) => {
@@ -151,7 +152,7 @@ class Home extends React.Component {
         })
         .then((data) => {
           let { article } = data;
-          this.setState({
+          return this.setState({
             articlesArr: this.state.articlesArr.map((a, i) => {
               if (i == index) {
                 return (a = article);
@@ -161,12 +162,12 @@ class Home extends React.Component {
             }),
           });
         })
-        .catch((err) => console.log(err));
-    } else if (favorited) {
-      return fetch(articlesURL + `/${slug}/favorite`, {
+        .catch((err) => console.log(err, 'error from catch'));
+    } else if (favourited) {
+      return fetch(articlesURL + `/${slug}/favourite`, {
         method: 'delete',
         headers: {
-          Authorization: `Token ${localStorage.token}`,
+          Authorization: `${localStorage.token}`,
         },
       })
         .then((res) => {

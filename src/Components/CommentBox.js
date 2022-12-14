@@ -17,7 +17,12 @@ class CommentBox extends React.Component {
   }
 
   fetchComments = () => {
-    return fetch(articlesURL + `/${this.props.slug}/comments`)
+    return fetch(articlesURL + `/${this.props.slug}/comments`, {
+      method: 'get',
+      headers: {
+        Authorization: `${this.props.user.token}`,
+      },
+    })
       .then((res) => {
         if (res.ok) {
           return res.json();
@@ -26,8 +31,9 @@ class CommentBox extends React.Component {
         }
       })
       .then((data) => {
+        console.log(data.commentsArr, 'these are all the comments');
         return this.setState({
-          allComments: data.comments,
+          allComments: data.commentsArr,
         });
       })
       .catch((err) => console.log(err));
@@ -41,19 +47,16 @@ class CommentBox extends React.Component {
 
   handleSubmit = (e) => {
     e.preventDefault();
-    e.target[0].value = '';
     if (this.state.comment) {
       let { comment } = this.state;
       return fetch(articlesURL + `/${this.props.slug}/comments`, {
         method: 'post',
         headers: {
           'content-type': 'application/json',
-          Authorization: `Token ${localStorage.token}`,
+          Authorization: `${this.props.user.token}`,
         },
         body: JSON.stringify({
-          comment: {
-            body: comment,
-          },
+          body: comment,
         }),
       })
         .then((res) => {
@@ -64,6 +67,9 @@ class CommentBox extends React.Component {
           }
         })
         .then((data) => {
+          this.setState({
+            comment: '',
+          });
           this.fetchComments();
         })
         .catch((err) => console.log(err));
@@ -75,7 +81,7 @@ class CommentBox extends React.Component {
     return fetch(articlesURL + `/${this.props.slug}/comments/${commentId}`, {
       method: 'DELETE',
       headers: {
-        Authorization: `Token ${localStorage.token}`,
+        Authorization: `${localStorage.token}`,
       },
     })
       .then((res) => {
@@ -102,14 +108,14 @@ class CommentBox extends React.Component {
               rows="4"
               placeholder="Write a comment..."
             ></textarea>
-            <div className="flex py-4 -mt-3  bg-[#F5F5F5] justify-between">
+            <div className="flex -mt-3 p-4 bg-[#F5F5F5] justify-between">
               <div>
                 <img
                   src={'/smiley.png'}
-                  className="h-9 w-9 object-contain rounded-full inline"
+                  className="h-8 w-8 object-contain rounded-full inline"
                   alt={user.username}
                 />
-                <p className="text-sm text-green-400 inline ">
+                <p className="text-sm font-bold text-green-400 inline-block ml-2 ">
                   {user.username}
                 </p>
               </div>
@@ -126,13 +132,13 @@ class CommentBox extends React.Component {
         {this.state.allComments.length > 0
           ? this.state.allComments.map((comment) => {
               return (
-                <div key={comment.id} className="my-3">
+                <div key={comment.createdAt} className="my-3">
                   <div className="flex flex-col justify-center rounded w-[630px] my-0 mx-auto">
                     <p className="border rounded p-4 text-sm">{comment.body}</p>
                     <div className="flex p-4 bg-[#F5F5F5] justify-between">
                       <div>
                         <img
-                          src={comment.author.image}
+                          src={comment.author.image || '/smiley.png'}
                           className="h-6 w-6 rounded-full inline"
                           alt={comment.id}
                         />

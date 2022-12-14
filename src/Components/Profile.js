@@ -33,12 +33,11 @@ class Profile extends React.Component {
     return fetch(rootURL + `profiles/${username}/follow`, {
       method: this.state.showFollowOrUnfollow == 'follow' ? 'post' : 'delete',
       headers: {
-        Authorization: `Token ${localStorage.token}`,
+        Authorization: `${localStorage.token}`,
       },
     })
       .then((res) =>
         res.json().then((data) => {
-          console.log(data, 'after');
           let { following } = data.profile;
           this.setState({
             showFollowOrUnfollow: following == true ? 'unfollow' : 'follow',
@@ -48,10 +47,11 @@ class Profile extends React.Component {
       .catch((err) => console.log(err));
   };
 
-  componentDidUpdate(_prevprops, prevState) {
+  componentDidUpdate(prevprops, prevState) {
     if (
       prevState.selectedTab != this.state.selectedTab ||
-      prevState.selectedPageButton != this.state.selectedPageButton
+      prevState.selectedPageButton != this.state.selectedPageButton ||
+      prevprops.match.params.username != this.props.match.params.username
     ) {
       return this.fetchArticles();
     }
@@ -60,10 +60,10 @@ class Profile extends React.Component {
   componentDidMount() {
     this.fetchArticles();
     if (this.props.match.params.username != this.props.user.username) {
-      fetch(rootURL + `/profiles/${this.props.match.params.username}`, {
+      fetch(rootURL + `profiles/${this.props.match.params.username}`, {
         method: 'get',
         headers: {
-          Authorization: `Token ${localStorage.token}`,
+          Authorization: `${localStorage.token}`,
         },
       })
         .then((res) => {
@@ -90,15 +90,15 @@ class Profile extends React.Component {
     const offset = (this.state.selectedPageButton - 1) * 10;
     let url;
     if (selectedTab == 'myArticles') {
-      url = articlesURL + `?author=${username}&limit=10&offset=${offset}?`;
+      url = articlesURL + `?author=${username}&limit=10&offset=${offset}`;
     } else if (selectedTab == 'myFavs') {
-      url = articlesURL + `?favorited=${username}&limit=10&offset=${offset}?`;
+      url = articlesURL + `?favouritedBy=${username}&limit=10&offset=${offset}`;
     }
     this.setState({ isLoading: true });
     fetch(url, {
       method: 'get',
       headers: {
-        Authorization: `Token ${localStorage.token}`,
+        Authorization: `${localStorage.token}`,
       },
     })
       .then((res) => {
@@ -115,7 +115,11 @@ class Profile extends React.Component {
           isLoading: false,
         });
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        this.setState({
+          isLoading: false,
+        });
+      });
   };
 
   handleClickOnPageButton = (pageNo) => {
@@ -138,7 +142,6 @@ class Profile extends React.Component {
   };
 
   handlefavOrUnfav = (slug, favorited, index) => {
-    console.log(slug, favorited, index);
     if (!favorited) {
       return fetch(articlesURL + `/${slug}/favorite`, {
         method: 'post',

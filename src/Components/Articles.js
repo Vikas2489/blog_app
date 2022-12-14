@@ -13,18 +13,20 @@ class Articles extends React.Component {
   render() {
     let { articlesArr, handlefavOrUnfav } = this.props;
     if (articlesArr.length > 0) {
-      <section>
-        {articlesArr.map((article, i) => {
-          return (
-            <Article
-              key={article.slug}
-              article={article}
-              i={i}
-              handlefavOrUnfav={handlefavOrUnfav}
-            />
-          );
-        })}
-      </section>;
+      return (
+        <section>
+          {articlesArr.map((article, i) => {
+            return (
+              <Article
+                key={article.slug}
+                article={article}
+                i={i}
+                handlefavOrUnfav={handlefavOrUnfav}
+              />
+            );
+          })}
+        </section>
+      );
     } else {
       return (
         <section>

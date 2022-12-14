@@ -9,7 +9,7 @@ class Settings extends React.Component {
     this.state = {
       username: this.props.user.username,
       image: '',
-      password: '',
+      password: null,
       bio: '',
       isUpdating: false,
       email: this.props.user.email,

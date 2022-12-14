@@ -36,10 +36,10 @@ export default class App extends React.Component {
       this.setState({
         isVerifying: true,
       });
-      return fetch(rootURL + 'user', {
+      return fetch(rootURL + 'users', {
         method: 'get',
         headers: {
-          Authorization: `Token ${token}`,
+          Authorization: `${token}`,
         },
       })
         .then((res) => {
@@ -127,7 +127,6 @@ function NonAuthenticatedApp(props) {
         <Route path="/register">
           <Register makeAuthToTrue={props.makeAuthToTrue} />
         </Route>
-
         <Route path="*">
           <Error />
         </Route>

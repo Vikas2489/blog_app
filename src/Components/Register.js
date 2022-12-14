@@ -11,6 +11,7 @@ class Register extends React.Component {
       username: '',
       password: '',
       email: '',
+      signingUp: false,
       errors: {
         username: '',
         password: '',
@@ -34,24 +35,38 @@ class Register extends React.Component {
     let { makeAuthToTrue } = this.props;
     let { email, username, password } = this.state;
     let errors = { ...this.state.errors };
-
-    registerOrLogin('register', email, username, password).then((data) => {
-      console.log(data, 'errors, data');
-      if (data.errors) {
-        this.setState({
-          errors: {
-            username: data.errors.username
-              ? 'username ' + data.errors.username
-              : '',
-            email: data.errors.email ? 'email ' + data.errors.email : '',
-            password: !this.state.password ? 'password cannot be blank' : '',
-          },
-        });
-      } else {
-        makeAuthToTrue(data.user);
-        this.props.history.push('/');
-      }
+    this.setState({
+      signingUp: true,
     });
+    if (email && password && username) {
+      registerOrLogin('register', email, username, password).then((data) => {
+        if (data.errors) {
+          this.setState({
+            signingUp: false,
+            errors: {
+              username: data.errors.username ? data.errors.username : '',
+              email: data.errors.email ? data.errors.email : '',
+              password: !this.state.password ? 'password cannot be blank' : '',
+            },
+          });
+        } else {
+          this.setState({
+            signingUp: false,
+          });
+          makeAuthToTrue(data.user);
+          this.props.history.push('/');
+        }
+      });
+    } else {
+      this.setState({
+        signingUp: false,
+        errors: {
+          username: 'username cannot be blank',
+          email: 'email cannot be blank',
+          password: 'password cannot be blank',
+        },
+      });
+    }
   };
 
   render() {
@@ -114,8 +129,8 @@ class Register extends React.Component {
             <input
               type="submit"
               onSubmit={this.handleSubmit}
-              value="Sign up"
-              disabled={username || email || password}
+              value={this.state.signingUp ? 'Signing Up...' : 'Sign up'}
+              disabled={username || email || password || this.state.signingUp}
               className="bg_green btn-register rounded text-white py-3 px-6 my-3"
             />
           </div>

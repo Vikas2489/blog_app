@@ -14,7 +14,7 @@ class SingleArticle extends React.Component {
   }
   componentDidMount() {
     let { slug } = this.props.match.params;
-    fetch(`https://mighty-oasis-08080.herokuapp.com/api/articles/${slug}`)
+    fetch(articlesURL + `/${slug}`)
       .then((res) => res.json())
       .then((data) => {
         this.setState({
@@ -27,7 +27,7 @@ class SingleArticle extends React.Component {
     fetch(articlesURL + `/${slug}`, {
       method: 'delete',
       headers: {
-        authorization: `Token ${localStorage.token}`,
+        authorization: `${localStorage.token}`,
       },
     })
       .then((res) => {
@@ -39,7 +39,7 @@ class SingleArticle extends React.Component {
 
   render() {
     if (this.state.articleInfo) {
-      var { title, tagList, body, createdAt, author, slug } =
+      var { title, taglist, body, createdAt, author, slug } =
         this.state.articleInfo;
       return (
         <>
@@ -48,14 +48,14 @@ class SingleArticle extends React.Component {
               <h3 className="text-white text-3xl font-semibold">{title}</h3>
               <div className="flex items-center mt-9">
                 <img
-                  className="w-10 h-10 rounded-full"
-                  src={author.image}
+                  className="w-8 h-8 rounded-full"
+                  src={author.image || '/smiley.png'}
                   alt={author.username}
                 />
                 <div className="ml-1">
                   <NavLink
                     to={'/profile/' + author.username}
-                    className="text-[#F1F0F0] text-sm"
+                    className="green font-bold text-sm"
                   >
                     {author.username}
                   </NavLink>
@@ -93,7 +93,7 @@ class SingleArticle extends React.Component {
             <article>
               <p className="text-xl font-thin leading-9 my-4">{body}</p>
               <div className="my-4">
-                {tagList.map((tag, i) => {
+                {taglist.map((tag, i) => {
                   return (
                     <button
                       key={i}
@@ -107,7 +107,7 @@ class SingleArticle extends React.Component {
               <hr />
             </article>
             {
-              <RegisterOrLogin
+              <ShowRegisterOrLogin
                 token={localStorage.token}
                 user={this.props.user}
                 slug={slug}
@@ -126,7 +126,7 @@ class SingleArticle extends React.Component {
   }
 }
 
-function RegisterOrLogin(props) {
+function ShowRegisterOrLogin(props) {
   if (!props.token) {
     <p className="ml-7 my-4 text-sm">
       <NavLink to="/login">

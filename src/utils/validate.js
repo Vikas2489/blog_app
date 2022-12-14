@@ -56,14 +56,18 @@ export function registerOrLogin(validateFor, email, username, password) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        user: {
-          username,
-          email,
-          password,
-        },
+        username,
+        email,
+        password,
       }),
     })
-      .then((res) => res.json())
+      .then((res) => {
+        if (res.ok) {
+          return res.json();
+        } else {
+          return res.json().then((err) => err);
+        }
+      })
       .then((data) => {
         return data;
       });
@@ -74,13 +78,17 @@ export function registerOrLogin(validateFor, email, username, password) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        user: {
-          email,
-          password,
-        },
+        email,
+        password,
       }),
     })
-      .then((res) => res.json())
+      .then((res) => {
+        if (res.ok) {
+          return res.json();
+        } else {
+          return res.json().then((err) => err);
+        }
+      })
       .then((data) => {
         return data;
       });
