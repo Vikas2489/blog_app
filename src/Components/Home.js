@@ -96,7 +96,7 @@ class Home extends React.Component {
           (selectedTab != null && selectedTab != 'global'
             ? `&taglist=${selectedTab}`
             : ''),
-        {
+        localStorage.token && {
           method: 'GET',
           headers: {
             Authorization: `${localStorage.token}`,
