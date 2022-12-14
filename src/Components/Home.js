@@ -201,6 +201,7 @@ class Home extends React.Component {
       selectedPageButton,
       selectedTab,
     } = this.state;
+
     let { auth, feedVisible } = this.props;
     let arrOfButton = this.pagination();
     return (

@@ -12,6 +12,7 @@ class Articles extends React.Component {
 
   render() {
     let { articlesArr, handlefavOrUnfav } = this.props;
+    console.log(articlesArr);
     if (articlesArr.length > 0) {
       return (
         <section>

@@ -141,12 +141,39 @@ class Profile extends React.Component {
     return arrOfPagination;
   };
 
-  handlefavOrUnfav = (slug, favorited, index) => {
-    if (!favorited) {
-      return fetch(articlesURL + `/${slug}/favorite`, {
+  handlefavOrUnfav = (slug, favourited, index) => {
+    if (!favourited) {
+      return fetch(articlesURL + `/${slug}/favourite`, {
         method: 'post',
         headers: {
-          Authorization: `Token ${localStorage.token}`,
+          Authorization: `${localStorage.token}`,
+        },
+      })
+        .then((res) => {
+          if (res.ok) {
+            return res.json();
+          } else {
+            return res.json().then((err) => Promise.reject(err));
+          }
+        })
+        .then((data) => {
+          let { article } = data;
+          return this.setState({
+            articlesArr: this.state.articlesArr.map((a, i) => {
+              if (i == index) {
+                return (a = article);
+              } else {
+                return a;
+              }
+            }),
+          });
+        })
+        .catch((err) => console.log(err, 'error from catch'));
+    } else if (favourited) {
+      return fetch(articlesURL + `/${slug}/favourite`, {
+        method: 'delete',
+        headers: {
+          Authorization: `${localStorage.token}`,
         },
       })
         .then((res) => {
@@ -169,27 +196,8 @@ class Profile extends React.Component {
           });
         })
         .catch((err) => console.log(err));
-    } else if (favorited) {
-      return fetch(articlesURL + `/${slug}/favorite`, {
-        method: 'delete',
-        headers: {
-          Authorization: `Token ${localStorage.token}`,
-        },
-      })
-        .then((res) => {
-          if (res.ok) {
-            return res.json();
-          } else {
-            return res.json().then((err) => Promise.reject(err));
-          }
-        })
-        .then((data) => {
-          this.fetchArticles();
-        })
-        .catch((err) => console.log(err));
     }
   };
-
   render() {
     let arrOfButton = this.pagination();
     return (
