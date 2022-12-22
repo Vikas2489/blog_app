@@ -56,20 +56,18 @@ class Settings extends React.Component {
     this.setState({
       isUpdating: true,
     });
-    return fetch(rootURL + 'user', {
+    return fetch(rootURL + 'users', {
       method: 'PUT',
       headers: {
         'content-type': 'application/json',
-        Authorization: `Token ${token}`,
+        Authorization: `${token}`,
       },
       body: JSON.stringify({
-        user: {
-          username: this.state.username,
-          image: this.state.image,
-          bio: this.state.bio,
-          password: this.state.password,
-          email: this.state.email,
-        },
+        username: this.state.username,
+        image: this.state.image,
+        bio: this.state.bio,
+        password: this.state.password,
+        email: this.state.email,
       }),
     })
       .then((res) => {
@@ -83,17 +81,19 @@ class Settings extends React.Component {
         this.setState({
           isUpdating: false,
         });
-        this.props.makeAuthToTrue(data.user);
+        console.log(data, 'updateduser');
+        // this.props.makeAuthToTrue(data.user);
       })
       .catch((err) => {
-        this.setState({
-          errors: {
-            username: err.errors.username
-              ? 'username ' + err.errors.username
-              : '',
-            email: err.errors.email ? 'email ' + err.errors.email : '',
-          },
-        });
+        console.log(err, 'err while updating');
+        // this.setState({
+        //   errors: {
+        //     username: err.errors.username
+        //       ? 'username ' + err.errors.username
+        //       : '',
+        //     email: err.errors.email ? 'email ' + err.errors.email : '',
+        //   },
+        // });
       });
   };
 
@@ -115,7 +115,7 @@ class Settings extends React.Component {
         <form
           className="w-full"
           method="PUT"
-          action={rootURL + 'user'}
+          action={rootURL + 'users'}
           onSubmit={this.handleSubmit}
         >
           <input
